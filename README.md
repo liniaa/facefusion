@@ -105,3 +105,5 @@ Documentation
 -------------
 
 Read the [documentation](https://docs.facefusion.io) for a deep dive.
+python3.10 -m venv venv
+source ./venv/bin/activate
