@@ -13,15 +13,22 @@ WORKDIR /app
 RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && \
     sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
 
-# 安装系统依赖
+# 安装基础依赖和添加Python 3.10 PPA
 RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3.10-dev \
-    python3.10-venv \
-    python3-pip \
+    software-properties-common \
     curl \
     wget \
     git \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update
+
+# 安装系统依赖
+RUN apt-get install -y \
+    python3.10 \
+    python3.10-dev \
+    python3.10-venv \
+    python3.10-distutils \
+    python3-pip \
     ffmpeg \
     libgl1-mesa-glx \
     libglib2.0-0 \
