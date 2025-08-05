@@ -2,7 +2,7 @@ services:
   facefusion:
     build: 
       context: .
-      dockerfile: Dockerfile.fast
+      dockerfile: Dockerfile.china
     container_name: facefusion-intel-gpu
     restart: unless-stopped
     
