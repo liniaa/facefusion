@@ -1,4 +1,4 @@
-# 使用Ubuntu 22.04基础镜像（原生支持Python 3.10）
+# 快速构建版本 - 使用Ubuntu 22.04原生Python 3.10
 FROM ubuntu:22.04
 
 # 设置环境变量
@@ -13,7 +13,7 @@ WORKDIR /app
 RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.aliyun.com@g' /etc/apt/sources.list && \
     sed -i 's@//.*security.ubuntu.com@//mirrors.aliyun.com@g' /etc/apt/sources.list
 
-# 安装系统依赖（Ubuntu 22.04原生支持Python 3.10）
+# 一次性安装所有系统依赖
 RUN apt-get update && apt-get install -y \
     python3.10 \
     python3.10-dev \
@@ -36,36 +36,41 @@ RUN apt-get update && apt-get install -y \
     gstreamer1.0-plugins-ugly \
     gstreamer1.0-libav \
     gstreamer1.0-tools \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # 创建Python符号链接
 RUN ln -sf /usr/bin/python3.10 /usr/bin/python3 && \
     ln -sf /usr/bin/python3.10 /usr/bin/python
 
-# 配置pip使用阿里云镜像源
+# 配置pip使用国内镜像源
 RUN mkdir -p ~/.pip && \
     echo "[global]" > ~/.pip/pip.conf && \
     echo "index-url = https://mirrors.aliyun.com/pypi/simple/" >> ~/.pip/pip.conf && \
     echo "trusted-host = mirrors.aliyun.com" >> ~/.pip/pip.conf
 
-# 升级pip
-RUN python3 -m pip install --upgrade pip
+# 修复并升级pip
+RUN apt-get update && apt-get install -y python3-pip --reinstall && \
+    python3 -m pip install --upgrade pip setuptools wheel --break-system-packages
 
-# 安装Intel OpenVINO运行时 (使用清华镜像源)
-RUN pip3 install openvino==2023.3.0 -i https://pypi.tuna.tsinghua.edu.cn/simple/
+# 先复制依赖文件（利用Docker缓存）
+COPY requirements*.txt ./
+
+# 安装Python依赖
+RUN pip3 install -r requirements-docker.txt -i https://mirrors.aliyun.com/pypi/simple/ --no-cache-dir
+
+# 安装Intel OpenVINO和相关依赖
+RUN pip3 install \
+    openvino==2023.3.0 \
+    onnxruntime-openvino==1.16.3 \
+    -i https://mirrors.aliyun.com/pypi/simple/ \
+    --no-cache-dir
 
 # 复制项目文件
 COPY . /app/
 
-# 安装Python依赖（使用Docker专用依赖文件）
-RUN pip3 install -r requirements-docker.txt -i https://mirrors.aliyun.com/pypi/simple/
-
-# 安装额外的Intel GPU支持依赖
-RUN pip3 install onnxruntime-openvino==1.16.3 -i https://mirrors.aliyun.com/pypi/simple/
-
-# 创建模型缓存目录
-RUN mkdir -p /app/.assets/models && \
-    mkdir -p /app/.caches
+# 创建必要目录
+RUN mkdir -p /app/.assets/models /app/.caches /app/output /app/input
 
 # 设置Intel GPU环境变量
 ENV OPENVINO_DEVICE=GPU
@@ -77,11 +82,13 @@ EXPOSE 7860
 
 # 创建启动脚本
 RUN echo '#!/bin/bash\n\
-echo "正在启动FaceFusion..."\n\
+set -e\n\
+echo "=== FaceFusion 启动中 ==="\n\
+echo "Python版本: $(python3 --version)"\n\
 echo "检测Intel GPU支持..."\n\
-python3 -c "import openvino as ov; core = ov.Core(); print(f\"可用设备: {core.available_devices}\")"\n\
+python3 -c "import openvino as ov; core = ov.Core(); devices = core.available_devices; print(f\"可用设备: {devices}\"); print(\"✓ Intel GPU支持正常\" if \"GPU\" in devices else \"⚠ 未检测到Intel GPU\")" || echo "⚠ OpenVINO检测失败"\n\
 echo "启动FaceFusion Web界面..."\n\
-python3 facefusion.py run \\\n\
+exec python3 facefusion.py run \\\n\
     --execution-providers openvino \\\n\
     --execution-device-id 0 \\\n\
     --ui-layouts default \\\n\
