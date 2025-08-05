@@ -127,8 +127,9 @@ def multi_process_capture(source_face : Face, webcam_capture : cv2.VideoCapture,
 
 			while webcam_capture and webcam_capture.isOpened():
 				_, capture_frame = webcam_capture.read()
-				if analyse_stream(capture_frame, webcam_fps):
-					yield None
+				# NSFW检测已禁用
+				# if analyse_stream(capture_frame, webcam_fps):
+				# 	yield None
 				future = executor.submit(process_stream_frame, source_face, capture_frame)
 				futures.append(future)
 
