@@ -1,0 +1,39 @@
+# FaceFusion Docker 专用依赖文件
+# 针对Intel UHD Graphics和中国网络环境优化
+
+# 基础依赖（使用固定版本确保稳定性）
+gradio-rangeslider==0.0.8
+gradio==5.25.2
+numpy==2.2.4
+onnx==1.17.0
+opencv-python==4.11.0.86
+psutil==7.0.0
+tqdm==4.67.1
+scipy==1.15.2
+
+# Intel GPU 支持
+onnxruntime==1.22.0
+openvino==2023.3.0
+onnxruntime-openvino==1.16.3
+
+# 额外的系统依赖
+Pillow>=9.0.0
+requests>=2.28.0
+urllib3>=1.26.0
+
+# 网络和下载优化
+certifi>=2022.12.7
+charset-normalizer>=3.0.0
+idna>=3.4
+
+# 多媒体处理
+imageio>=2.25.0
+imageio-ffmpeg>=0.4.8
+
+# 数学计算优化
+numba>=0.56.0
+scikit-image>=0.19.0
+
+# 日志和调试
+colorama>=0.4.6
+rich>=13.0.0
