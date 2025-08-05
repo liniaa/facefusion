@@ -1,5 +1,5 @@
 # 中国网络环境优化版本
-FROM registry.cn-hangzhou.aliyuncs.com/library/ubuntu:22.04
+FROM registry.cn-hangzhou.aliyuncs.com/ubuntu/ubuntu:22.04
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive
