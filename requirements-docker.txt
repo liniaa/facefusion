@@ -14,7 +14,7 @@ scipy==1.15.2
 # Intel GPU 支持
 onnxruntime==1.22.0
 openvino==2023.3.0
-onnxruntime-openvino==1.16.3
+# onnxruntime-openvino版本在Dockerfile中单独处理以确保兼容性
 
 # 额外的系统依赖
 Pillow>=9.0.0

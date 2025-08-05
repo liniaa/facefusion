@@ -61,7 +61,7 @@ COPY . /app/
 RUN pip3 install -r requirements-docker.txt -i https://mirrors.aliyun.com/pypi/simple/
 
 # 安装额外的Intel GPU支持依赖
-RUN pip3 install onnxruntime-openvino==1.16.3 -i https://mirrors.aliyun.com/pypi/simple/
+RUN pip3 install onnxruntime-openvino==1.22.0 -i https://mirrors.aliyun.com/pypi/simple/
 
 # 创建模型缓存目录
 RUN mkdir -p /app/.assets/models && \

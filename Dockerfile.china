@@ -76,10 +76,23 @@ RUN pip3 install -r requirements-docker.txt \
     --no-cache-dir \
     --timeout 300
 
-# 安装Intel OpenVINO和相关依赖
+# 安装Intel OpenVINO和相关依赖（使用兼容版本）
 RUN pip3 install \
     openvino==2023.3.0 \
-    onnxruntime-openvino==1.16.3 \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple/ \
+    --no-cache-dir \
+    --timeout 300
+
+# 尝试安装兼容的onnxruntime-openvino版本
+RUN pip3 install onnxruntime-openvino==1.22.0 \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple/ \
+    --no-cache-dir \
+    --timeout 300 || \
+    pip3 install onnxruntime-openvino==1.20.0 \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple/ \
+    --no-cache-dir \
+    --timeout 300 || \
+    pip3 install onnxruntime-openvino==1.19.0 \
     -i https://pypi.tuna.tsinghua.edu.cn/simple/ \
     --no-cache-dir \
     --timeout 300

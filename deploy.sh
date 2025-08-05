@@ -70,28 +70,29 @@ sudo systemctl restart docker
 echo "👤 配置Docker用户权限..."
 sudo usermod -aG docker $USER
 
-# 构建Docker镜像
+# 构建Docker镜像（使用中国优化版本）
 echo "🏗️  构建FaceFusion Docker镜像..."
-docker-compose build --no-cache
+echo "使用中国网络优化版本 Dockerfile.china..."
+docker-compose -f docker-compose.china.yml build --no-cache
 
 # 预下载模型文件（使用国内镜像）
 echo "📥 预下载模型文件..."
-docker-compose run --rm facefusion python3 facefusion.py force-download --download-provider huggingface
+docker-compose -f docker-compose.china.yml run --rm facefusion python3 facefusion.py force-download --download-provider huggingface
 
 echo
 echo "✅ 部署完成！"
 echo
 echo "🚀 启动命令："
-echo "   docker-compose up -d"
+echo "   docker-compose -f docker-compose.china.yml up -d"
 echo
 echo "🌐 访问地址："
 echo "   http://localhost:7860"
 echo
 echo "📊 查看日志："
-echo "   docker-compose logs -f"
+echo "   docker-compose -f docker-compose.china.yml logs -f"
 echo
 echo "🛑 停止服务："
-echo "   docker-compose down"
+echo "   docker-compose -f docker-compose.china.yml down"
 echo
 echo "💡 注意事项："
 echo "   1. 首次启动可能需要较长时间下载模型"
@@ -100,6 +101,7 @@ echo "   3. 如遇网络问题，可尝试重新运行此脚本"
 echo
 echo "🔧 故障排除："
 echo "   - 检查GPU权限: ls -la /dev/dri/"
-echo "   - 查看容器状态: docker-compose ps"
-echo "   - 重新构建: docker-compose build --no-cache"
+echo "   - 查看容器状态: docker-compose -f docker-compose.china.yml ps"
+echo "   - 重新构建: docker-compose -f docker-compose.china.yml build --no-cache"
+echo "   - 测试依赖兼容性: python3 test-dependencies.py"
 echo
